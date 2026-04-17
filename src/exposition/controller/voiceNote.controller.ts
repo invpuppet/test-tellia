@@ -14,6 +14,12 @@ export default class VoiceNoteController {
       example: {
         transcript:
           'Tomorrow at 9am call the irrigation technician about the pump failure in field 12',
+        structuredData: {
+          type: 'tassk',
+          entities: {
+            location: 'field 12',
+          },
+        },
       },
     },
   })

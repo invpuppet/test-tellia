@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import Groq from 'groq-sdk';
 import { TranscriptionPort } from '../../../domain/ports/transcription.port';
+import { GROQ_CLIENT } from '../../groq/groq.constants';
 
 @Injectable()
 export default class TranscriptionAdapter implements TranscriptionPort {
-  private readonly client = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  constructor(@Inject(GROQ_CLIENT) private readonly client: Groq) {}
 
   async transcribe(audioFile: File): Promise<string> {
     const transcript = await this.client.audio.transcriptions.create({

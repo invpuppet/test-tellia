@@ -11,6 +11,10 @@ import {
   VoiceNoteCommand,
   VoiceNoteResult,
 } from '../../domain/models/voiceNote.model';
+import {
+  STRUCTURING_PORT,
+  StructuringPort,
+} from '../../domain/ports/structuring.port';
 
 @Injectable()
 export default class VoiceNoteService {
@@ -19,12 +23,15 @@ export default class VoiceNoteService {
     private readonly transcription: TranscriptionPort,
     @Inject(AUDIO_DOWNLOAD_PORT)
     private readonly audioDownloader: AudioDowloadPort,
+    @Inject(STRUCTURING_PORT)
+    private readonly structuring: StructuringPort,
   ) {}
 
   async transcribeAudio(command: VoiceNoteCommand): Promise<VoiceNoteResult> {
     const audioFile = await this.audioDownloader.download(command.audioUrl);
     const transcript = await this.transcription.transcribe(audioFile);
+    const structuredData = await this.structuring.structure(transcript);
 
-    return { transcript };
+    return { transcript, structuredData };
   }
 }

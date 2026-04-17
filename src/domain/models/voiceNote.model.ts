@@ -6,4 +6,5 @@ export interface VoiceNoteCommand {
 
 export interface VoiceNoteResult {
   transcript: string;
+  structuredData: Record<string, unknown>;
 }

@@ -10,7 +10,6 @@ import ApplicationModule from './application/application.module';
       envFilePath: '.env',
     }),
     ApplicationModule,
-    
   ],
   controllers: [VoiceNoteController],
   providers: [],
