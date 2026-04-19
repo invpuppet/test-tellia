@@ -4,7 +4,7 @@
 $ npm install
 ```
 
-You need either a Groq API key.
+You need a Groq API key.
 
 ## Compile and run the project
 
@@ -65,21 +65,21 @@ exposition → application → domain ports ← infrastructure
 
 Here we can see which layer depends on what:
 
-- the infrastructure depends on the domain to implements it's port, never the other ay around.
-- the application only know the domain but never the true implementation.
+- The infrastructure depends on the domain to implement its ports, never the other way around.
+- The application only knows the domain but never the true implementation.
 
 ## Task 4 Improvement
 
 ### Logger
 
-Why logger :
+Why logging:
 
-- In case of error/bug, we can locate it easely through the process
-- It doesn't change the actual process and can be implemanted with nestjs internal logger
+- In case of error or bug, we can locate it easily throughout the process
+- It does not change the actual process and can be implemented with the NestJS built-in logger
 
-Tradeoff :
+Tradeoff:
 
-- Doesn't prevent the error, just let us know if it happens
+- Does not prevent errors, just lets us know when they happen
 
 ## Task 5
 
@@ -89,17 +89,31 @@ As I implemented the approach B (dynamic structure), the design is allready able
 
 ### 2. Predefined schemas vs dynamic structure
 
+**Predefined schema (Approach A)**
+| Advantages | Disadvantages |
+| ---------- | ------------- |
+| Predictable output | Rigid - each new type require development |
+| Simple database queries | Does not cover unexpected cases |
+| LLM can make fewer errors when given a structured from | Loses on information that does not fit in the schema |
+
+**Dynamic structure (Approach B)**
+| Advantages | Disadvantages |
+| ---------- | ------------- |
+| Flexible - adapt to any type of note | Variable outputs, difficult to query |
+| Capture all available information | Can lead to unstable output |
+| No schema maintenance | Higher LLM cost |
+
 ### 3. Scaling to thousands of concurrent users
 
 _**Note:** As I didn't work on a userbase this large but I tried to awnser it_
-Right now, the biggest problem would be the the time used by each operation (depends on the API used for the AI).
-All the requests are also treated synchronously which could become a bottleneck.
+Right now, the biggest problem would be the time taken by each operation (which depends on the API used for the AI).
+All requests are also processed synchronously, which could become a bottleneck.
 
-A message queue as a buffer could help prevent the system falling apart on a high volume of data.
-Another option could be to limit the rate per deviceId or by user account in the future to prevent abuse (as it's already done by big AI companies).
+A message queue used as a buffer could help prevent the system from falling apart under a high volume of requests.
+Another option would be to rate limit requests per `deviceId` or by user account to prevent abuse (as already done by major AI companies).
 
 ### 4. Noisy environments
 
-This could parasite the audio sent to the application which in turn could change the data saved in the transcript
+Background noise could affect the audio sent to the application, which in turn could degrade the transcript and the structured data saved.
 
-Some noise suppresion could be used on the device before uppload but there will always be loud noise like heavy machinery or wind that could disrupt the audio.
+Some noise suppression could be applied on the device before upload, but there will always be loud sounds such as heavy machinery or strong wind that could disrupt the audio regardless.
