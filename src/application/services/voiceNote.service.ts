@@ -9,12 +9,18 @@ import {
 } from '../../domain/ports/transcription.port';
 import {
   VoiceNoteCommand,
+  VoiceNoteEntry,
   VoiceNoteResult,
 } from '../../domain/models/voiceNote.model';
 import {
   STRUCTURING_PORT,
   StructuringPort,
 } from '../../domain/ports/structuring.port';
+import {
+  VOICE_NOTE_REPOSITORY_PORT,
+  VoiceNoteRepositoryPort,
+} from '../../domain/ports/voiceNote.repository.port';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export default class VoiceNoteService {
@@ -25,6 +31,8 @@ export default class VoiceNoteService {
     private readonly audioDownloader: AudioDowloadPort,
     @Inject(STRUCTURING_PORT)
     private readonly structuring: StructuringPort,
+    @Inject(VOICE_NOTE_REPOSITORY_PORT)
+    private readonly repository: VoiceNoteRepositoryPort,
   ) {}
 
   async transcribeAudio(command: VoiceNoteCommand): Promise<VoiceNoteResult> {
@@ -32,6 +40,19 @@ export default class VoiceNoteService {
     const transcript = await this.transcription.transcribe(audioFile);
     const structuredData = await this.structuring.structure(transcript);
 
+    this.repository.save({
+      id: randomUUID(),
+      deviceId: command.deviceId,
+      timestamp: command.timestamp,
+      transcript,
+      structured: structuredData,
+      createdAt: new Date().toISOString(),
+    });
+
     return { transcript, structuredData };
+  }
+
+  async findAll(): Promise<VoiceNoteEntry[]> {
+    return this.repository.findAll();
   }
 }

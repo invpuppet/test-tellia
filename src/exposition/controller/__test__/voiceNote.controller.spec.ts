@@ -6,6 +6,7 @@ import VoiceNoteService from '../../../application/services/voiceNote.service';
 import { AUDIO_DOWNLOAD_PORT } from '../../../domain/ports/audioDownload.port';
 import { TRANSCRIPTION_PORT } from '../../../domain/ports/transcription.port';
 import { STRUCTURING_PORT } from '../../../domain/ports/structuring.port';
+import { VOICE_NOTE_REPOSITORY_PORT } from '../../../domain/ports/voiceNote.repository.port';
 import {
   RAW_AUDIO_CONTENT,
   VoiceNoteCommandFixture,
@@ -19,9 +20,12 @@ describe('VoiceNoteController (integration)', () => {
   const downloadMock = jest.fn<Promise<File>, [string]>();
   const transcribeMock = jest.fn<Promise<string>, [File]>();
   const structureMock = jest.fn<Promise<Record<string, unknown>>, [string]>();
+  const saveMock = jest.fn();
+  const findAllMock = jest.fn();
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    findAllMock.mockReturnValue([]);
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [VoiceNoteController],
@@ -33,6 +37,10 @@ describe('VoiceNoteController (integration)', () => {
           useValue: { transcribe: transcribeMock },
         },
         { provide: STRUCTURING_PORT, useValue: { structure: structureMock } },
+        {
+          provide: VOICE_NOTE_REPOSITORY_PORT,
+          useValue: { save: saveMock, findAll: findAllMock },
+        },
       ],
     }).compile();
 
@@ -89,5 +97,27 @@ describe('VoiceNoteController (integration)', () => {
       .set('Content-Type', 'application/json')
       .send(payload)
       .expect(400);
+  });
+
+  it('GET /voice-notes should return stored entries', async () => {
+    const voiceNotes = [
+      {
+        id: 'note-1',
+        deviceId: 'device-001',
+        timestamp: '2026-03-10T10:30:00Z',
+        transcript: 'Transcript text',
+        structured: { type: 'task' },
+        createdAt: '2026-04-17T10:00:00.000Z',
+      },
+    ];
+
+    findAllMock.mockReturnValue(voiceNotes);
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+
+    const response = await request(httpServer).get('/voice-notes').expect(200);
+
+    expect(response.body).toEqual(voiceNotes);
+    expect(findAllMock).toHaveBeenCalledTimes(1);
   });
 });

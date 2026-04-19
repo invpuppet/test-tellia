@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import CreateVoiceNoteDto from '../dto/createVoiceNote.dto';
 import VoiceNoteService from '../../application/services/voiceNote.service';
@@ -7,6 +7,7 @@ import VoiceNoteService from '../../application/services/voiceNote.service';
 @ApiTags('voice-note')
 export default class VoiceNoteController {
   constructor(private readonly voiceNoteService: VoiceNoteService) {}
+
   @Post('voice-note')
   @ApiOperation({ summary: 'Transcribe a voice note' })
   @ApiOkResponse({
@@ -15,7 +16,7 @@ export default class VoiceNoteController {
         transcript:
           'Tomorrow at 9am call the irrigation technician about the pump failure in field 12',
         structuredData: {
-          type: 'tassk',
+          type: 'task',
           entities: {
             location: 'field 12',
           },
@@ -25,5 +26,11 @@ export default class VoiceNoteController {
   })
   async extractVoiceNote(@Body() dto: CreateVoiceNoteDto) {
     return this.voiceNoteService.transcribeAudio(dto);
+  }
+
+  @Get('voice-notes')
+  @ApiOperation({ summary: 'Get all voice notes saved' })
+  async findall() {
+    return await this.voiceNoteService.findAll();
   }
 }

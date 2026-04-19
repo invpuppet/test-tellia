@@ -3,6 +3,7 @@ import TranscriptionModule from './transcription/transcription.module';
 import AudioDowloadModule from './audioDownload/audioDownload.module';
 import StructuringModule from './structuring/structuring.module';
 import GroqModule from './groq/groq.module';
+import RepositoryModule from './repository/repository.module';
 
 @Module({
   imports: [
@@ -10,12 +11,14 @@ import GroqModule from './groq/groq.module';
     TranscriptionModule,
     AudioDowloadModule,
     StructuringModule,
+    RepositoryModule,
   ],
   exports: [
     GroqModule,
     TranscriptionModule,
     AudioDowloadModule,
     StructuringModule,
+    RepositoryModule,
   ],
 })
 export default class InfrastructureModule {}
